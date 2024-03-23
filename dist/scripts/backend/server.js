@@ -270,12 +270,27 @@ app.post("/api/post/deletecode/", isAuth, async (req, res) => {
     await res.json({ status: "ok", code: 200, data: "Deleted!" });
 });
 
+function isValidURL(string) {
+    try {
+        new URL(string);
+    } catch (_) {
+        return false;
+    }
+    return true;
+}
+
 //// takes a code ID, a new URL, and updates the code
 app.post("/api/post/updatecode/", isAuth, async (req, res) => {
     const { id, newURL } = req.body;
+    // check if newURL is valid as a URL
+    if (!isValidURL(newURL)) {
+        res.json({ status: "error", code: 400, data: "Invalid URL" });
+        return;
+    }
+
     const currentUser = await getUserData(req);
     const dbResponse = await Code.findOne({ _id: id });
-    console.log(dbResponse);
+
     if (dbResponse.owner != currentUser) {
         res.json({ status: "error", code: 403, data: "Not your code!" });
         return;

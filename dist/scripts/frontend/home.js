@@ -207,7 +207,12 @@ async function generateCodes(codes) {
             updateLinkButton.addEventListener("click", async (event) => {
                 event.preventDefault();
                 const newURL = prompt("Enter a new URL:");
-                if (newURL === null) {
+                if (
+                    newURL === null ||
+                    newURL === "" ||
+                    newURL === code.redirect_url ||
+                    !newURL.startsWith("http")
+                ) {
                     return;
                 }
                 const response = await fetch("/api/post/updatecode/", {
@@ -226,6 +231,8 @@ async function generateCodes(codes) {
                     trackEvent(events.updateCodeLink, {
                         [eventProperties.type]: code.type,
                     });
+                } else {
+                    toast(data.data, true);
                 }
             });
             buttons.appendChild(updateLinkButton);
